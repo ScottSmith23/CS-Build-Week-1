@@ -1,0 +1,13 @@
+.box{
+    width: 20px;
+    height: 20px;
+    border: solid 1px black;
+    transition: 0.12s;
+    -webkit-animation: color-change 0.2s linear infinite alternate;
+    -moz-animation: color-change 0.2s linear infinite alternate;
+    animation: color-change 0.2s linear infinite alternate;
+    }
+
+.box:hover{
+    background-color:lightgreen;
+    }
