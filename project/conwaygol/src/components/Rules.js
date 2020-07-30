@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import styled from "styled-components";
-import { Collapse, Button, CardBody, Card } from 'reactstrap';
+import '../styles/Rules.css'
 
 const DescripDiv = styled.div`
 
@@ -15,6 +15,13 @@ const Rules = props => {
   return (
   <DescripDiv className="DescDiv">
     <DescripTitle className="image-title">Rules:</DescripTitle>
+    <div className="ruleList">
+    <ul>
+      <li>Bing</li>
+      <li>Bing</li>
+      <li>Wahoo</li>
+    </ul>
+    </div>
     </DescripDiv>
   );
 };
