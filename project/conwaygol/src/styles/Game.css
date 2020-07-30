@@ -24,3 +24,14 @@
     justify-content:center;
     background-image: linear-gradient(#4e8afa,rgb(147, 176, 238));
 }
+
+.buttonDiv{
+    display: flex;
+    justify-content: space-around;
+}
+
+.buttonStyle{
+    border-radius: 5px;
+    background-color: lightseagreen;
+    color: white;
+}

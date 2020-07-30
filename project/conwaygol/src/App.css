@@ -28,6 +28,18 @@
   color: #61dafb;
 }
 
+.gamediv{
+
+}
+
+.ruleDiv{
+
+}
+
+.topHalf{
+  display: flex;
+  justify-content:space-around;
+}
 
 @keyframes App-logo-spin {
   from {

@@ -2,8 +2,18 @@ import React, { useState, useCallback, useRef } from 'react';
 import produce from 'immer';
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
+import styled from "styled-components";
 import '../styles/Game.css'
 
+const DescripDiv = styled.div`
+
+color:gainsboro;
+`
+
+const GenTitle = styled.h3`
+font-family: 'Anton', sans-serif;
+
+`
 
 function Game() {
 
@@ -11,6 +21,9 @@ function Game() {
     const runningRef = useRef(running);
     const [gridSize,setGridSize] = useState({numRows:25,numCols:25})
     const [genCount,setGenCount] = useState(0)
+    const [cursorType,setCursorType] = useState("pixel")
+    const [runSpeed,setRunSpeed] = useState(100)
+    const [stepMode,setStepMode] = useState(false)
     runningRef.current = running;
     let count = 0;
 
@@ -45,10 +58,22 @@ function Game() {
         }
 
     //fills a box at i,k coords
-    const fillBox = (i,k) => {
+    const fillBox = (i,k,type) => {
+        const shapes = {
+            pixel: [[0,0]],
+            glider: [[0,0],[1,1],[-1,0],[-1,1],[-1,2]],
+            beacon: [[0,0],[-1,0],[-1,1],[2,2],[2,3],[1,3]],
+            pentadec:[[0,0],[-1,1],[-2,1],[0,2],[1,1],[2,1],[3,1],[4,1],[5,0],[5,2],[6,1],[7,1]],
+        }
         if(!running){
             const newGrid = produce(grid,gridCopy => {
-                gridCopy[i][k] = grid[i][k] ? 0 : 1
+                    let shape = shapes[type]
+                    shape.forEach(([x,y]) => {
+                        const newI = i + x;
+                        const newK = k + y;
+                        gridCopy[newI][newK] =  (grid[i][k] ? 0 : 1) 
+                    })
+
             })
             setGrid(newGrid)
         }
@@ -68,6 +93,17 @@ function Game() {
         
     }
 
+    //step
+    const oneStep = () => {
+        setRunning(!running);
+        if (!running) {
+            runningRef.current = true;
+            gameStart();
+            }
+            setRunning(false);
+  
+    }
+
     //randomize
     const randGen = () => {
         const rows = [];
@@ -84,6 +120,7 @@ function Game() {
         setGrid(clearGrid());
         clearUsed();
         setGridSize({numRows:newRow,numCols:newCol});
+        
         
     }
 
@@ -120,17 +157,17 @@ function Game() {
                 }
             })
         })
-        count = count + 1
-        setGenCount(count + 1)
-        setTimeout(gameStart,100);
-    },[gridSize])
+        setGenCount(genCount => genCount + 1)
+        setTimeout(gameStart,runSpeed);
+        
+    },[gridSize],[runSpeed])
 
 
   return (
       <>
-            <div>
-    <p>Generations: {`${genCount}`}</p>
-      </div>
+            <DescripDiv>
+    <GenTitle>Generations: {`${genCount}`}</GenTitle>
+      </DescripDiv>
     <div className="gameGrid">
     <div style={{
         display: 'grid',
@@ -141,28 +178,44 @@ function Game() {
         <div 
         className={`box ${i}-${k}`}
         key={`${i}-${k}`} 
-        onMouseDown={()=> {fillBox(i,k)}}
+        onMouseDown={()=> {fillBox(i,k,cursorType)}}
         style={{
             backgroundColor: grid[i][k] ? 'black' : undefined}} />))}
     </div>
     </div>
     <div className="buttonDiv">
-    <button onClick={() => {playPause()}}>
-                {running ? 'stop' : 'start'}
+    <button className='buttonStyle' onClick={() => {playPause()}}>
+                {running ? 'Pause' : 'Start'}
     </button>
-    <button onClick={() => {randGen()}}
-      >Randomize
-    </button>
-    <button onClick={() => {
+    <button className='buttonStyle' onClick={() => {
             setGrid(clearGrid());
             clearUsed();
         }}
       >Clear
     </button>
-    <DropdownButton id="dropdown-basic-button" title="Dropdown button">
+    <button className='buttonStyle' onClick={() => {oneStep();
+
+        }}
+      >Step
+    </button>
+    <button className='buttonStyle' onClick={() => {randGen()}}
+      >Random
+    </button>
+    <DropdownButton id="dropdown-basic-button" title="Grid Size">
     <Dropdown.Item onClick={() => {changeGrid(25,25)}}>25x25</Dropdown.Item>
     <Dropdown.Item onClick={() => {changeGrid(32,32)}}>32x32</Dropdown.Item>
     <Dropdown.Item onClick={() => {changeGrid(48,48)}}>48x48</Dropdown.Item>
+    </DropdownButton>
+    <DropdownButton id="dropdown-basic-button" title="Preset">
+    <Dropdown.Item onClick={() => {setCursorType("pixel")}}>Pixel</Dropdown.Item>
+    <Dropdown.Item onClick={() => {setCursorType("glider")}}>Glider</Dropdown.Item>
+    <Dropdown.Item onClick={() => {setCursorType("beacon")}}>Beacon</Dropdown.Item>
+    <Dropdown.Item onClick={() => {setCursorType("pentadec")}}>PentaDec</Dropdown.Item>
+    </DropdownButton>
+    <DropdownButton id="dropdown-basic-button" title="Speed">
+    <Dropdown.Item onClick={() => {setRunSpeed(100)}}>100</Dropdown.Item>
+    <Dropdown.Item onClick={() => {setRunSpeed(500)}}>500</Dropdown.Item>
+    <Dropdown.Item onClick={() => {setRunSpeed(1000)}}>1000</Dropdown.Item>
     </DropdownButton>
       </div>
     </>
